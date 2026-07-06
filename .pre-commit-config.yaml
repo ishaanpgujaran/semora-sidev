@@ -1,0 +1,11 @@
+# Semora local pre-commit hook configuration
+# TODO(scaffold-agent): Configure automatic hook installation and verification.
+
+repos:
+  - repo: local
+    hooks:
+      - id: semora-gate
+        name: Semora Autonomous Quality Gate
+        entry: semora run
+        language: system
+        stages: [commit]

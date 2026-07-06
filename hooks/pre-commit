@@ -1,0 +1,5 @@
+#!/bin/sh
+# TODO(scaffold-agent): Execute Semora quality gate on git commit.
+
+echo "Running Semora Autonomous Quality Gate..."
+exec semora run --commit

@@ -1,0 +1,10 @@
+// TODO(reporting-sync-agent): Define Firestore security rules (per-user read/write rules).
+// This file will be filled in by the Reporting & Sync Agent.
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false; // Secure by default, to be customized
+    }
+  }
+}
