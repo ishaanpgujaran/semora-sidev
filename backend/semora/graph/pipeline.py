@@ -1,14 +1,17 @@
 import asyncio
 from google.adk.workflow import Workflow, JoinNode, node
 from backend.semora.graph.state import RunState
+from backend.semora.graph.spec_agent import generate_specs
 
 
 @node
 async def spec_node(node_input: RunState) -> RunState:
     print(f"[spec_node] Received RunState with repo: {node_input.repo_path}")
-    await asyncio.sleep(0.5)
+    # Call BDD spec generation
+    updated_state = generate_specs(node_input)
     print(f"[spec_node] Finished.")
-    return node_input
+    return updated_state
+
 
 
 @node
