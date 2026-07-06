@@ -8,4 +8,4 @@ repos:
         name: Semora Autonomous Quality Gate
         entry: semora run
         language: system
-        stages: [commit]
+        stages: [pre-commit]
