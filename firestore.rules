@@ -1,10 +1,13 @@
-// TODO(reporting-sync-agent): Define Firestore security rules (per-user read/write rules).
-// This file will be filled in by the Reporting & Sync Agent.
+// This single rule is the entire authorization layer for the product. 
+// There is no custom backend server checking permissions. Instead, Firestore 
+// itself natively enforces that a user can only ever read or write 
+// documents that are located strictly under their own UID.
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if false; // Secure by default, to be customized
+    match /users/{userId}/runs/{runId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
     }
   }
 }
