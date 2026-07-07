@@ -10,7 +10,7 @@
 [![License](https://img.shields.io/badge/license-MIT-green)]()
 [![Built with](https://img.shields.io/badge/built%20with-Antigravity%20%2B%20ADK%202.0-purple)]()
 
-[Live Dashboard](https://semora-sidev.web.app/) · [Demo Video](#) · [Architecture](#architecture) · [Quickstart](#quickstart)
+[Live Dashboard](https://semora-sidev.web.app/) · [Demo Video](https://youtu.be/OIOKeBbLOtU?si=7lSmsbhO1RFhKaIZ) · [Architecture](#architecture) · [Quickstart](#quickstart)
 
 </div>
 
@@ -161,7 +161,7 @@ pytest backend/tests/
 
 ## Demo Video
 
-[Watch the 5-minute demo on YouTube](#) — covers the problem, the agent architecture, a live Antigravity build session, a blocked-then-fixed commit, and the deployed dashboard updating in real time.
+[Watch the 3-minute demo on YouTube](https://youtu.be/OIOKeBbLOtU?si=7lSmsbhO1RFhKaIZ) — covers the problem, the agent architecture, a live Antigravity build session, a blocked-then-fixed commit, and the deployed dashboard updating in real time.
 
 ## Built For
 
