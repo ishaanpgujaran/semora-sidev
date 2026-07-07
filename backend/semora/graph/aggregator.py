@@ -1,19 +1,44 @@
-"""Graph Aggregator Module.
+"""
+Aggregator Node Module.
 
-Aggregates execution output, compiles scores, and coordinates reporting & sync.
+Provides the ADK graph node that computes the final compliance verdict
+by aggregating results from upstream Execution and Threat nodes.
 """
 
-from typing import Dict, Any
+from typing import Any, Union
+from backend.semora.graph.state import RunState
+from backend.semora.reporting.compliance_score import calculate_compliance_score
 
-
-def aggregate_results(state: Dict[str, Any]) -> Dict[str, Any]:
-    """Aggregate test and security audit results, generating final status.
+def aggregate_results(
+    state: Union[dict[str, Any], RunState],
+) -> Union[dict[str, Any], RunState]:
+    """
+    ADK graph node for aggregation.
+    
+    Reads `execution_results` and `threat_findings` from the state,
+    computes the `compliance_score`, and updates the state.
 
     Args:
-        state (Dict[str, Any]): Current pipeline state.
+        state: Current pipeline state, either a `RunState` Pydantic model or
+            a plain dict with the same top-level keys.
 
     Returns:
-        Dict[str, Any]: Aggregated pipeline state ready for reporting and synchronization.
+        The updated pipeline state with `compliance_score` populated.
     """
-    # TODO(reporting-sync-agent): Combine audit reports, calculate final compliance score, and write outputs.
+    is_pydantic = not isinstance(state, dict) and hasattr(state, "repo_path")
+    
+    if is_pydantic:
+        execution_results = getattr(state, "execution_results", {})
+        threat_findings = getattr(state, "threat_findings", [])
+    else:
+        execution_results = state.get("execution_results", {})
+        threat_findings = state.get("threat_findings", [])
+        
+    score = calculate_compliance_score(execution_results, threat_findings)
+    
+    if is_pydantic:
+        state.compliance_score = score
+    else:
+        state["compliance_score"] = score
+        
     return state
