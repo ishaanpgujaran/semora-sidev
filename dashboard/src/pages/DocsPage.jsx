@@ -8,105 +8,122 @@ import React from 'react';
 export default function DocsPage() {
   return (
     <div className="min-h-screen bg-zinc-50 text-zinc-900 font-sans selection:bg-blue-100 selection:text-blue-900">
-      {/* Navigation */}
-      <nav className="max-w-4xl mx-auto px-6 py-8 flex justify-between items-center border-b border-zinc-200">
-        <a href="/" className="font-serif text-2xl font-semibold tracking-tight text-zinc-900 hover:opacity-80 transition-opacity">
+
+      {/* Navigation — matches LandingPage exactly */}
+      <nav className="max-w-6xl mx-auto px-8 py-7 flex justify-between items-center">
+        <a
+          href="/"
+          className="font-serif text-xl font-semibold tracking-tight text-zinc-900 hover:opacity-75 transition-opacity duration-150"
+        >
           Semora
         </a>
-        <div className="flex gap-6 items-center text-sm font-medium text-zinc-600">
-          <a href="/docs" className="text-zinc-900 transition-colors">Documentation</a>
-          <a href="/login" className="hover:text-zinc-900 transition-colors">Sign In</a>
+        <div className="flex gap-8 items-center text-sm font-medium text-zinc-500">
+          <a href="/docs" className="text-zinc-900">Documentation</a>
+          <a href="/login" className="hover:text-zinc-900 transition-colors duration-150">Sign In</a>
         </div>
       </nav>
 
       {/* Docs Content */}
-      <main className="max-w-3xl mx-auto px-6 py-16">
-        <header className="mb-16">
-          <h1 className="font-serif text-4xl md:text-5xl text-zinc-900 mb-4">Quick Start</h1>
-          <p className="text-lg text-zinc-600">Get Semora running in your repository in under two minutes.</p>
+      <main className="max-w-2xl mx-auto px-8 pt-16 pb-28">
+
+        <header className="mb-16 border-b border-zinc-200 pb-10">
+          <h1 className="font-serif text-4xl md:text-5xl font-normal tracking-tight text-zinc-900 mb-4">
+            Quick Start
+          </h1>
+          <p className="text-base text-zinc-500 leading-relaxed">
+            Get Semora running in your repository in under two minutes.
+          </p>
         </header>
 
-        <div className="space-y-12">
-          
-          {/* Step 1: Prerequisites */}
-          <section>
-            <div className="flex items-center gap-4 mb-4">
-              <span className="flex-shrink-0 w-8 h-8 rounded bg-zinc-200 text-zinc-900 font-serif font-medium flex items-center justify-center">1</span>
-              <h2 className="font-serif text-2xl text-zinc-900">Prerequisites</h2>
-            </div>
-            <ul className="list-disc list-inside text-zinc-600 space-y-2 ml-12">
-              <li><strong>Python 3.11+</strong> installed on your machine.</li>
-              <li><strong>Git</strong> initialized in your target repository.</li>
-              <li>A free <strong>Gemini API key</strong> from Google AI Studio.</li>
-            </ul>
-          </section>
+        <ol className="space-y-14">
 
-          {/* Step 2: Installation */}
-          <section>
-            <div className="flex items-center gap-4 mb-4">
-              <span className="flex-shrink-0 w-8 h-8 rounded bg-zinc-200 text-zinc-900 font-serif font-medium flex items-center justify-center">2</span>
-              <h2 className="font-serif text-2xl text-zinc-900">Installation</h2>
+          {/* Step 1 */}
+          <li className="flex gap-6">
+            <span className="flex-shrink-0 mt-0.5 w-7 h-7 rounded-full bg-zinc-900 text-zinc-50 font-serif text-sm flex items-center justify-center">
+              1
+            </span>
+            <div className="flex-1 min-w-0">
+              <h2 className="font-serif text-xl text-zinc-900 mb-3">Prerequisites</h2>
+              <ul className="space-y-2 text-sm text-zinc-600">
+                <li className="flex gap-2">
+                  <span className="text-zinc-300 mt-0.5">—</span>
+                  <span><strong className="text-zinc-800">Python 3.11+</strong> installed on your machine.</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-zinc-300 mt-0.5">—</span>
+                  <span><strong className="text-zinc-800">Git</strong> initialized in your target repository.</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-zinc-300 mt-0.5">—</span>
+                  <span>A free <strong className="text-zinc-800">Gemini API key</strong> from Google AI Studio.</span>
+                </li>
+              </ul>
             </div>
-            <div className="ml-12">
-              <p className="text-zinc-600 mb-2">Install the Semora CLI globally via pip:</p>
-              <pre className="bg-zinc-900 text-zinc-100 p-4 rounded-md overflow-x-auto text-sm font-mono">
-                <code>pip install semora</code>
-              </pre>
-            </div>
-          </section>
+          </li>
 
-          {/* Step 3: Initial Setup */}
-          <section>
-            <div className="flex items-center gap-4 mb-4">
-              <span className="flex-shrink-0 w-8 h-8 rounded bg-zinc-200 text-zinc-900 font-serif font-medium flex items-center justify-center">3</span>
-              <h2 className="font-serif text-2xl text-zinc-900">Initialize Repository</h2>
+          {/* Step 2 */}
+          <li className="flex gap-6">
+            <span className="flex-shrink-0 mt-0.5 w-7 h-7 rounded-full bg-zinc-900 text-zinc-50 font-serif text-sm flex items-center justify-center">
+              2
+            </span>
+            <div className="flex-1 min-w-0">
+              <h2 className="font-serif text-xl text-zinc-900 mb-3">Installation</h2>
+              <p className="text-sm text-zinc-500 mb-3">Install the Semora CLI via pip:</p>
+              <pre className="bg-zinc-900 text-zinc-100 px-5 py-4 rounded text-sm font-mono leading-relaxed overflow-x-auto">
+pip install semora</pre>
             </div>
-            <div className="ml-12">
-              <p className="text-zinc-600 mb-2">Navigate to your project directory and run:</p>
-              <pre className="bg-zinc-900 text-zinc-100 p-4 rounded-md overflow-x-auto text-sm font-mono mb-4">
-                <code>semora init</code>
-              </pre>
-              <p className="text-sm text-zinc-500 bg-zinc-100 p-3 rounded border border-zinc-200">
-                <strong>Note:</strong> This automatically installs a git pre-commit hook that intercepts your commits to run the autonomous CI gate before they are finalized.
+          </li>
+
+          {/* Step 3 */}
+          <li className="flex gap-6">
+            <span className="flex-shrink-0 mt-0.5 w-7 h-7 rounded-full bg-zinc-900 text-zinc-50 font-serif text-sm flex items-center justify-center">
+              3
+            </span>
+            <div className="flex-1 min-w-0">
+              <h2 className="font-serif text-xl text-zinc-900 mb-3">Initialize Repository</h2>
+              <p className="text-sm text-zinc-500 mb-3">Navigate to your project directory and run:</p>
+              <pre className="bg-zinc-900 text-zinc-100 px-5 py-4 rounded text-sm font-mono leading-relaxed overflow-x-auto mb-4">
+semora init</pre>
+              <p className="text-sm text-zinc-500 bg-zinc-100 px-4 py-3 rounded border border-zinc-200 leading-relaxed">
+                <strong className="text-zinc-700">Note:</strong> This installs a git pre-commit hook that intercepts each commit
+                to run the autonomous CI gate before it is finalized.
               </p>
             </div>
-          </section>
+          </li>
 
-          {/* Step 4: Connect Dashboard */}
-          <section>
-            <div className="flex items-center gap-4 mb-4">
-              <span className="flex-shrink-0 w-8 h-8 rounded bg-zinc-200 text-zinc-900 font-serif font-medium flex items-center justify-center">4</span>
-              <h2 className="font-serif text-2xl text-zinc-900">Connect to Dashboard</h2>
+          {/* Step 4 */}
+          <li className="flex gap-6">
+            <span className="flex-shrink-0 mt-0.5 w-7 h-7 rounded-full bg-zinc-900 text-zinc-50 font-serif text-sm flex items-center justify-center">
+              4
+            </span>
+            <div className="flex-1 min-w-0">
+              <h2 className="font-serif text-xl text-zinc-900 mb-3">Connect to Dashboard</h2>
+              <p className="text-sm text-zinc-500 mb-3">Sync your local runs to the web dashboard:</p>
+              <pre className="bg-zinc-900 text-zinc-100 px-5 py-4 rounded text-sm font-mono leading-relaxed overflow-x-auto mb-2">
+semora login</pre>
+              <p className="text-sm text-zinc-500">You will be prompted for your Semora email and password.</p>
             </div>
-            <div className="ml-12">
-              <p className="text-zinc-600 mb-2">Sync your local runs to the web dashboard:</p>
-              <pre className="bg-zinc-900 text-zinc-100 p-4 rounded-md overflow-x-auto text-sm font-mono mb-2">
-                <code>semora login</code>
-              </pre>
-              <p className="text-sm text-zinc-500">You will be prompted to enter your Semora email and password.</p>
-            </div>
-          </section>
+          </li>
 
-          {/* Step 5: Manual Check */}
-          <section>
-            <div className="flex items-center gap-4 mb-4">
-              <span className="flex-shrink-0 w-8 h-8 rounded bg-zinc-200 text-zinc-900 font-serif font-medium flex items-center justify-center">5</span>
-              <h2 className="font-serif text-2xl text-zinc-900">Run a Manual Check</h2>
+          {/* Step 5 */}
+          <li className="flex gap-6">
+            <span className="flex-shrink-0 mt-0.5 w-7 h-7 rounded-full bg-zinc-900 text-zinc-50 font-serif text-sm flex items-center justify-center">
+              5
+            </span>
+            <div className="flex-1 min-w-0">
+              <h2 className="font-serif text-xl text-zinc-900 mb-3">Run a Manual Check</h2>
+              <p className="text-sm text-zinc-500 mb-3">To trigger a CI run without committing:</p>
+              <pre className="bg-zinc-900 text-zinc-100 px-5 py-4 rounded text-sm font-mono leading-relaxed overflow-x-auto">
+semora run</pre>
             </div>
-            <div className="ml-12">
-              <p className="text-zinc-600 mb-2">To trigger a CI run manually without committing:</p>
-              <pre className="bg-zinc-900 text-zinc-100 p-4 rounded-md overflow-x-auto text-sm font-mono">
-                <code>semora run</code>
-              </pre>
-            </div>
-          </section>
+          </li>
 
-        </div>
+        </ol>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-zinc-200 py-12 mt-12">
-        <div className="max-w-4xl mx-auto px-6 text-center text-sm text-zinc-500">
+      {/* Footer — matches LandingPage */}
+      <footer className="border-t border-zinc-200 py-10">
+        <div className="max-w-6xl mx-auto px-8 text-center text-sm text-zinc-400">
           &copy; {new Date().getFullYear()} Semora. All rights reserved.
         </div>
       </footer>

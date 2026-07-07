@@ -66,9 +66,9 @@ export default function ProjectPortfolio() {
 
   return (
     <div>
-      <header className="mb-10">
-        <h1 className="font-serif text-3xl text-zinc-900 mb-2">Project Portfolio</h1>
-        <p className="text-zinc-600">All repositories synced to your Semora account.</p>
+      <header className="mb-12">
+        <h1 className="font-serif text-3xl font-normal text-zinc-900 mb-1.5">Project Portfolio</h1>
+        <p className="text-sm text-zinc-500">All repositories synced to your Semora account.</p>
       </header>
 
       {error && (

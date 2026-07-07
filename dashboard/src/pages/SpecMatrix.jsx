@@ -76,19 +76,20 @@ export default function SpecMatrix() {
 
   return (
     <div>
-      <header className="mb-10">
-        <h1 className="font-serif text-3xl text-zinc-900 mb-2">Spec Matrix</h1>
-        <p className="text-zinc-600">Gherkin BDD spec coverage across all features and files.</p>
+      <header className="mb-12">
+        <h1 className="font-serif text-3xl font-normal text-zinc-900 mb-1.5">Spec Matrix</h1>
+        <p className="text-sm text-zinc-500">Gherkin BDD spec coverage across all features and files.</p>
         {pct !== null && (
-          <div className="mt-4 flex items-center gap-3">
-            <div className="flex-1 max-w-xs bg-zinc-200 rounded-full h-1.5">
+          <div className="mt-5 flex items-center gap-3">
+            <div className="flex-1 max-w-xs bg-zinc-200 rounded-full h-px" style={{height: '3px'}}>
               <div
-                className="h-1.5 rounded-full bg-blue-600 transition-all"
+                className="h-full rounded-full bg-blue-600 transition-all duration-500"
                 style={{ width: `${pct}%` }}
               />
             </div>
-            <span className="text-sm font-medium text-zinc-700">
-              {coveredCount} / {totalCount} covered ({pct}%)
+            <span className="text-sm text-zinc-500">
+              <strong className="text-zinc-800 font-medium">{coveredCount}</strong> / {totalCount} covered
+              <span className="text-zinc-400 ml-1">({pct}%)</span>
             </span>
           </div>
         )}
