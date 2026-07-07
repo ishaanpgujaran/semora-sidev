@@ -30,8 +30,18 @@ class RunState(BaseModel):
     )
     threat_findings: list[dict[str, Any]] = Field(
         default_factory=list,
-        description="A list of security threat findings, populated by the Threat node. "
-                    "Expected shape: [ { 'severity': str, 'description': str, 'location': str }, ... ]."
+        description=(
+            "A list of STRIDE security threat findings, populated by the Threat node. "
+            "Each item is a ThreatFinding dict with exactly six keys: "
+            "  'category'        (str)  — STRIDE category, e.g. 'I — Information Disclosure'; "
+            "  'severity'        (str)  — 'CRITICAL' | 'HIGH' | 'WARNING'; "
+            "  'file'            (str)  — relative path to the affected file; "
+            "  'line'            (int)  — 1-indexed line number of the finding; "
+            "  'description'     (str)  — human-readable explanation of the threat; "
+            "  'suggested_patch' (str)  — short inline code suggestion (not a full diff). "
+            "A CRITICAL finding must cause the Aggregator compliance gate to fail "
+            "(compliance_score = 0)."
+        ),
     )
     compliance_score: Optional[int] = Field(
         default=None,
