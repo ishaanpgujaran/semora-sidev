@@ -1,18 +1,44 @@
 """Test suite for the Spec Agent spec generation logic.
 
-Verifies that the generate_specs function analyzes diffs, invokes the Gemini API,
-generates appropriate Gherkin BDD specifications with edge cases and happy paths,
-writes the result feature files to tests/features/ in the target repository,
-and updates the shared pipeline RunState correctly.
+Verifies that the generate_specs function analyzes diffs, generates appropriate
+Gherkin BDD specifications with edge cases and happy paths, writes the result
+feature files to tests/features/ in the target repository, and updates the
+shared pipeline RunState correctly (using mocked Gemini API calls to prevent rate limits).
 """
 
 import os
 import shutil
 from pathlib import Path
 import pytest
+from unittest.mock import MagicMock, patch
 
 from backend.semora.graph.state import RunState
-from backend.semora.graph.spec_agent import generate_specs
+from backend.semora.graph.spec_agent import generate_specs, FeatureFile, FeatureGenerationResult
+
+MOCK_FEATURE_CONTENT = """Feature: Email Validation
+  As a developer
+  I want to validate email strings
+
+  Scenario: Happy path validation
+    Given valid email address
+    When validating
+    Then return true
+
+  Scenario: Empty email input
+    Given empty string
+    When validating
+    Then return false
+
+  Scenario: Invalid email type
+    Given invalid type input
+    When validating
+    Then return false
+
+  Scenario: Format validation checks
+    Given format checks input
+    When validating
+    Then return false
+"""
 
 
 @pytest.fixture
@@ -21,7 +47,26 @@ def temp_repo(tmp_path: Path) -> Path:
     return tmp_path
 
 
-def test_generate_specs_with_dict(temp_repo: Path) -> None:
+@pytest.fixture
+def mock_gemini_client():
+    """Mock the Google GenAI Client and return a predefined feature generation result."""
+    mock_feature = FeatureFile(
+        filename="is_valid_email.feature",
+        content=MOCK_FEATURE_CONTENT
+    )
+    mock_parsed_result = FeatureGenerationResult(features=[mock_feature])
+
+    mock_response = MagicMock()
+    mock_response.parsed = mock_parsed_result
+
+    mock_client = MagicMock()
+    mock_client.models.generate_content.return_value = mock_response
+
+    with patch("backend.semora.graph.spec_agent.genai.Client", return_value=mock_client):
+        yield mock_client
+
+
+def test_generate_specs_with_dict(temp_repo: Path, mock_gemini_client) -> None:
     """Verify BDD spec generation when state is passed as a dictionary."""
     diff_text = '''diff --git a/email_helper.py b/email_helper.py
 new file mode 100644
@@ -41,7 +86,7 @@ index 0000000..e69de29
 +    if "@" not in email or "." not in email:
 +        return False
 +    return True
-'''
++'''
     recent_commit_messages = ["feat: add email validation helper function"]
 
     state = {
@@ -82,7 +127,7 @@ index 0000000..e69de29
         assert not title.isdigit(), f"Generic numeric scenario title: {title!r}"
 
 
-def test_generate_specs_with_run_state(temp_repo: Path) -> None:
+def test_generate_specs_with_run_state(temp_repo: Path, mock_gemini_client) -> None:
     """Verify BDD spec generation when state is passed as a RunState model."""
     diff_text = '''diff --git a/email_helper.py b/email_helper.py
 new file mode 100644
@@ -102,7 +147,7 @@ index 0000000..e69de29
 +    if "@" not in email or "." not in email:
 +        return False
 +    return True
-'''
++'''
     recent_commit_messages = ["feat: add email validation helper function"]
 
     run_state = RunState(

@@ -71,6 +71,8 @@ def generate_specs(
 Analyze the following git diff and recent commit messages to identify new or changed functions.
 
 For each new or changed function, write a Gherkin .feature file.
+The filename of each Gherkin .feature file MUST be exactly '<function_name>.feature' where <function_name> is the name of the new or changed function (for example, if the function is named 'is_valid_email', the filename MUST be exactly 'is_valid_email.feature').
+
 Each Gherkin .feature file MUST cover:
 1. Happy path: The standard successful execution flow of the function.
 2. At least three adversarial edge cases appropriate to the function's apparent purpose. For functions taking user input, this means:
@@ -88,14 +90,25 @@ Recent Commit Messages:
 {commit_msg_str}
 """
 
-    response = client.models.generate_content(
-        model='gemini-2.5-flash',
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json",
-            response_schema=FeatureGenerationResult,
-        ),
-    )
+    import time
+    max_retries = 5
+    delay = 2.0
+    for attempt in range(max_retries):
+        try:
+            response = client.models.generate_content(
+                model='gemini-2.5-flash',
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    response_schema=FeatureGenerationResult,
+                ),
+            )
+            break
+        except Exception as e:
+            if attempt == max_retries - 1:
+                raise e
+            time.sleep(delay)
+            delay *= 2.0
 
     result = response.parsed
     if not result or not result.features:
@@ -111,8 +124,9 @@ Recent Commit Messages:
             filename += ".feature"
 
         file_path = os.path.join(features_dir, filename)
+        gherkin_content = feature.content.replace("\\n", "\n").replace("\\r\\n", "\n")
         with open(file_path, "w", encoding="utf-8") as f:
-            f.write(feature.content)
+            f.write(gherkin_content)
 
         if is_pydantic:
             if file_path not in state.generated_specs:

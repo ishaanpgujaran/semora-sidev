@@ -14,12 +14,15 @@ async def spec_node(node_input: RunState) -> RunState:
 
 
 
+from backend.semora.graph.execution_agent import execute_specs
+
+
 @node
 async def execution_node(node_input: RunState) -> RunState:
     print(f"[execution_node] Started processing...")
-    await asyncio.sleep(1.5)
+    updated_state = execute_specs(node_input)
     print(f"[execution_node] Finished.")
-    return node_input
+    return updated_state
 
 
 @node
