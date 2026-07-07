@@ -57,7 +57,9 @@ def run(commit: bool) -> None:
     report = generate_markdown_report(final_state)
     click.echo(report)
     
-    # TODO(reporting-sync-agent): Sync results to Firebase here (to be implemented)
+    # Sync results to Firebase Dashboard
+    from backend.semora.sync.firestore_client import sync_report
+    sync_report(final_state)
     
     # Pre-commit hook compliance check
     score = final_state.compliance_score if final_state.compliance_score is not None else 0
