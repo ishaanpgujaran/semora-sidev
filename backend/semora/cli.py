@@ -26,8 +26,16 @@ def init() -> None:
 @main.command()
 def login() -> None:
     """Log in to Firebase using user credentials for reporting sync."""
-    # TODO(reporting-sync-agent): Authenticate user via firebase_auth.py.
     click.echo("Logging in to Firebase backend...")
+    email = click.prompt("Email", type=str)
+    password = click.prompt("Password", type=str, hide_input=True)
+    
+    from backend.semora.sync.firebase_auth import login_command
+    try:
+        login_command(email, password)
+    except Exception as e:
+        click.echo(f"Login failed: {e}", err=True)
+        sys.exit(1)
 
 
 @main.command()
