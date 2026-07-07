@@ -7,8 +7,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../.
 
 from google.adk.apps import App
 from google.adk.runners import InMemoryRunner
-from backend.semora.graph.state import RunState
-from backend.semora.graph.pipeline import semora_graph
+from semora.graph.state import RunState
+from semora.graph.pipeline import semora_graph
 
 from google.genai import types
 import json

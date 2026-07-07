@@ -13,7 +13,7 @@ from pydantic import BaseModel
 from google import genai
 from google.genai import types
 
-from backend.semora.graph.state import RunState
+from semora.graph.state import RunState
 
 # Load environment variables from .env
 load_dotenv()

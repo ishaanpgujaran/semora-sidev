@@ -18,8 +18,7 @@ from google import genai
 from google.genai import types
 from dotenv import load_dotenv
 
-from backend.semora.sandbox.runner import get_runner
-from semora.mcp.filesystem_server import FilesystemMCPServer
+from semora.sandbox.runner import get_runner
 
 # Load environment variables
 load_dotenv()
@@ -34,7 +33,9 @@ def find_function_in_repo(
     repo_path: str,
     function_name: str
 ) -> Tuple[Optional[str], Optional[Dict[str, Any]]]:
-    """Search for the Python file and AST signature of a function in the target repository using MCP tools.
+    """Search for the Python file and AST signature of a function in the target repository.
+
+    Uses direct file I/O (not MCP) since this runs in-process inside the pipeline.
 
     Args:
         repo_path (str): Absolute path of target repository.
@@ -43,52 +44,50 @@ def find_function_in_repo(
     Returns:
         Tuple[str, Dict]: Relative path of python file and its signature metadata, or (None, None).
     """
-    server = FilesystemMCPServer(repo_root=repo_path)
+    import glob
 
-    async def search() -> Tuple[Optional[str], Optional[Dict[str, Any]]]:
-        # 1. List all python files via list_files tool
-        _, list_res = await server.mcp.call_tool("list_files", {"pattern": "**/*.py"})
-        py_files = list_res.get("result", [])
+    # List all Python files in the repo
+    py_files = glob.glob(os.path.join(repo_path, "**/*.py"), recursive=True)
 
-        # Filter out tests, hidden folders, and virtual environments
-        source_files = [
-            f for f in py_files
-            if not f.startswith("tests/")
-            and not f.startswith(".")
-            and "venv" not in f
-        ]
+    # Filter out tests, hidden folders, and virtual environments
+    source_files = []
+    for f in py_files:
+        rel = os.path.relpath(f, repo_path)
+        if not rel.startswith("tests") and not rel.startswith(".") and "venv" not in rel:
+            source_files.append(rel)
 
-        for rel_path in source_files:
-            # 2. Read each source file via read_file tool
-            _, read_res = await server.mcp.call_tool("read_file", {"path": rel_path})
-            code_content = read_res.get("result", "")
+    for rel_path in source_files:
+        abs_path = os.path.join(repo_path, rel_path)
+        try:
+            with open(abs_path, "r", encoding="utf-8") as fh:
+                code_content = fh.read()
+        except (OSError, UnicodeDecodeError):
+            continue
 
-            # Quick string check first to avoid ast parsing everything
-            if f"def {function_name}" in code_content:
-                try:
-                    tree = ast.parse(code_content)
-                    for node in ast.walk(tree):
-                        if isinstance(node, ast.FunctionDef) and node.name == function_name:
-                            # Parse arguments and returns
-                            args_info = []
-                            for arg in node.args.args:
-                                ann = ast.unparse(arg.annotation) if arg.annotation else "Any"
-                                args_info.append((arg.arg, ann))
-                            returns = ast.unparse(node.returns) if node.returns else "Any"
-                            doc = ast.get_docstring(node) or ""
+        # Quick string check first to avoid ast parsing everything
+        if f"def {function_name}" in code_content:
+            try:
+                tree = ast.parse(code_content)
+                for node in ast.walk(tree):
+                    if isinstance(node, ast.FunctionDef) and node.name == function_name:
+                        # Parse arguments and returns
+                        args_info = []
+                        for arg in node.args.args:
+                            ann = ast.unparse(arg.annotation) if arg.annotation else "Any"
+                            args_info.append((arg.arg, ann))
+                        returns = ast.unparse(node.returns) if node.returns else "Any"
+                        doc = ast.get_docstring(node) or ""
 
-                            signature = {
-                                "name": node.name,
-                                "args": args_info,
-                                "returns": returns,
-                                "docstring": doc
-                            }
-                            return rel_path, signature
-                except Exception:
-                    pass
-        return None, None
-
-    return asyncio.run(search())
+                        signature = {
+                            "name": node.name,
+                            "args": args_info,
+                            "returns": returns,
+                            "docstring": doc
+                        }
+                        return rel_path, signature
+            except Exception:
+                pass
+    return None, None
 
 
 def generate_step_defs_via_gemini(
@@ -255,14 +254,9 @@ def run_features(
         rel_feat_path = os.path.relpath(abs_feat_path, repo_path)
 
         # 1. Read the feature file content
-        server = FilesystemMCPServer(repo_root=repo_path)
-
-        async def read_feat() -> str:
-            _, read_res = await server.mcp.call_tool("read_file", {"path": rel_feat_path})
-            return read_res.get("result", "")
-
         try:
-            feat_content = asyncio.run(read_feat())
+            with open(abs_feat_path, "r", encoding="utf-8") as fh:
+                feat_content = fh.read()
         except Exception as e:
             overall_passed = False
             results_ledger[feat_file] = {

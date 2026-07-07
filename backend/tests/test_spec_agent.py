@@ -12,8 +12,8 @@ from pathlib import Path
 import pytest
 from unittest.mock import MagicMock, patch
 
-from backend.semora.graph.state import RunState
-from backend.semora.graph.spec_agent import generate_specs, FeatureFile, FeatureGenerationResult
+from semora.graph.state import RunState
+from semora.graph.spec_agent import generate_specs, FeatureFile, FeatureGenerationResult
 
 MOCK_FEATURE_CONTENT = """Feature: Email Validation
   As a developer

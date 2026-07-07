@@ -8,8 +8,8 @@ status, error logs, assertion messages), and updates the shared pipeline RunStat
 from typing import Dict, Any, Union
 from dotenv import load_dotenv
 
-from backend.semora.graph.state import RunState
-from backend.semora.sandbox.pytest_bdd_bridge import run_features
+from semora.graph.state import RunState
+from semora.sandbox.pytest_bdd_bridge import run_features
 
 # Load env variables
 load_dotenv()

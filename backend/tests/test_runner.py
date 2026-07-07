@@ -10,7 +10,7 @@ import tempfile
 import pytest
 from pathlib import Path
 
-from backend.semora.sandbox.runner import run_in_sandbox, get_runner
+from semora.sandbox.runner import run_in_sandbox, get_runner
 
 
 def test_valid_command_execution() -> None:

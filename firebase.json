@@ -1,3 +1,15 @@
 {
-  "_comment": "TODO(reporting-sync-agent): Configure Firebase Hosting for dashboard/dist and Firestore database rules/indexes. This file will be populated by the Reporting & Sync Agent."
+  "hosting": {
+    "public": "dashboard/dist",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  }
 }

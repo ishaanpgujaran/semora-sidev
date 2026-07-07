@@ -51,9 +51,9 @@ Severity classification rules (CRITICAL / HIGH / WARNING)
 import re
 from typing import Any, Union
 
-from backend.semora.graph.state import RunState
-from backend.semora.security.semgrep_wrapper import SemgrepNotFoundError, run_semgrep
-from backend.semora.security.stride_rules import _normalize_rule_id, map_to_stride
+from semora.graph.state import RunState
+from semora.security.semgrep_wrapper import SemgrepNotFoundError, run_semgrep
+from semora.security.stride_rules import _normalize_rule_id, map_to_stride
 
 # ---------------------------------------------------------------------------
 # Severity classification — rule_id substring patterns

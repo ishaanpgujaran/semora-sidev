@@ -6,8 +6,8 @@ by aggregating results from upstream Execution and Threat nodes.
 """
 
 from typing import Any, Union
-from backend.semora.graph.state import RunState
-from backend.semora.reporting.compliance_score import calculate_compliance_score
+from semora.graph.state import RunState
+from semora.reporting.compliance_score import calculate_compliance_score
 
 def aggregate_results(
     state: Union[dict[str, Any], RunState],

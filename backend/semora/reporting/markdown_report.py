@@ -4,7 +4,7 @@ Markdown Report formatting for Semora terminal output.
 import os
 import subprocess
 from typing import Any
-from backend.semora.graph.state import RunState
+from semora.graph.state import RunState
 
 def get_git_branch(repo_path: str) -> str:
     """Gets the current git branch name."""

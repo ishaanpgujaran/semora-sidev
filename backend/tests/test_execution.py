@@ -13,8 +13,8 @@ from pathlib import Path
 import git
 from unittest.mock import patch
 
-from backend.semora.graph.state import RunState
-from backend.semora.graph.execution_agent import execute_specs
+from semora.graph.state import RunState
+from semora.graph.execution_agent import execute_specs
 
 MOCK_FEATURE_CONTENT = """Feature: Email Validation
   As a user

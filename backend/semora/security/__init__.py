@@ -10,8 +10,8 @@ map_to_stride     — enrich a raw semgrep finding with STRIDE category + patch
 STRIDE_MAPPING    — exact-match lookup table (custom rule IDs → STRIDE category)
 """
 
-from backend.semora.security.semgrep_wrapper import SemgrepNotFoundError, run_semgrep
-from backend.semora.security.stride_rules import STRIDE_MAPPING, map_to_stride
+from semora.security.semgrep_wrapper import SemgrepNotFoundError, run_semgrep
+from semora.security.stride_rules import STRIDE_MAPPING, map_to_stride
 
 __all__ = [
     "run_semgrep",

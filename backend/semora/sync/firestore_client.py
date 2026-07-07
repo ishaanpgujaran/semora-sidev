@@ -9,8 +9,8 @@ import requests
 from typing import Any, Dict, Union
 from dotenv import load_dotenv
 
-from backend.semora.graph.state import RunState
-from backend.semora.sync.firebase_auth import get_valid_id_token, _load_session
+from semora.graph.state import RunState
+from semora.sync.firebase_auth import get_valid_id_token, _load_session
 
 # Ensure .env is loaded
 load_dotenv()
@@ -32,10 +32,43 @@ def _to_firestore_value(data: Any) -> Dict[str, Any]:
     else:
         return {"stringValue": str(data)}
 
+def _normalize_severity(sev: str) -> str:
+    """Convert backend severity strings to title case for the frontend.
+
+    Backend uses: CRITICAL, HIGH, WARNING
+    Frontend expects: Critical, High, Medium, Low
+    """
+    mapping = {
+        "CRITICAL": "Critical",
+        "HIGH": "High",
+        "WARNING": "Medium",
+    }
+    return mapping.get(sev.upper(), sev.title()) if sev else "Medium"
+
+
+def _get_commit_sha(repo_path: str) -> str:
+    """Get the current HEAD commit SHA, or empty string if unavailable."""
+    try:
+        import git
+        repo = git.Repo(repo_path, search_parent_directories=True)
+        return str(repo.head.commit.hexsha)
+    except Exception:
+        return ""
+
+
 def serialize_run_state(state: Union[RunState, dict]) -> Dict[str, Any]:
-    """Converts a RunState into a Firestore REST Document format."""
+    """Converts a RunState into a Firestore REST Document format.
+
+    The output fields are aligned with what the React dashboard expects:
+      - repo_name    (str)  — basename of repo_path
+      - commit_sha   (str)  — HEAD commit SHA
+      - compliance_score (int)
+      - stride_findings  (list) — renamed from threat_findings, title-case severity
+      - specs        (list) — structured [{feature, file, covered}]
+      - timestamp    (Firestore Timestamp via timestampValue)
+    """
     is_pydantic = not isinstance(state, dict)
-    
+
     if is_pydantic:
         if hasattr(state, "model_dump"):
             data = state.model_dump()
@@ -43,14 +76,64 @@ def serialize_run_state(state: Union[RunState, dict]) -> Dict[str, Any]:
             data = getattr(state, "dict", lambda: dict(state.__dict__))()
     else:
         data = dict(state)
-        
-    # Inject timestamp so the dashboard can sort them
-    data["timestamp"] = int(time.time())
-    
-    fields = {}
-    for k, v in data.items():
+
+    repo_path = data.get("repo_path", "")
+
+    # Build the dashboard-friendly document
+    doc: Dict[str, Any] = {}
+
+    # repo_name: basename of the repo path
+    doc["repo_name"] = os.path.basename(os.path.abspath(repo_path)) if repo_path else "unknown"
+
+    # commit_sha
+    doc["commit_sha"] = _get_commit_sha(repo_path)
+
+    # compliance_score
+    doc["compliance_score"] = data.get("compliance_score", 0) or 0
+
+    # stride_findings: renamed from threat_findings, with title-case severity
+    raw_findings = data.get("threat_findings", [])
+    doc["stride_findings"] = [
+        {
+            "category": f.get("category", ""),
+            "severity": _normalize_severity(f.get("severity", "")),
+            "file": f.get("file", ""),
+            "line": f.get("line", 0),
+            "description": f.get("description", ""),
+            "suggested_patch": f.get("suggested_patch", ""),
+        }
+        for f in raw_findings
+    ]
+
+    # specs: transform flat file paths into structured objects for SpecMatrix
+    execution_results = data.get("execution_results", {})
+    generated_specs = data.get("generated_specs", [])
+    doc["specs"] = [
+        {
+            "feature": os.path.splitext(os.path.basename(spec_path))[0],
+            "file": spec_path,
+            "covered": bool(
+                execution_results.get(spec_path, {}).get("passed", False)
+            ) if isinstance(execution_results.get(spec_path), dict) else False,
+        }
+        for spec_path in generated_specs
+    ]
+
+    # execution_results (keep for detail views)
+    doc["execution_results"] = execution_results
+
+    # timestamp: Firestore timestampValue (ISO 8601)
+    from datetime import datetime, timezone
+    now_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    # Build Firestore REST fields
+    fields: Dict[str, Any] = {}
+    for k, v in doc.items():
         fields[k] = _to_firestore_value(v)
-        
+
+    # Override timestamp to use Firestore's native timestampValue
+    fields["timestamp"] = {"timestampValue": now_iso}
+
     return {"fields": fields}
 
 def sync_report(state: Union[RunState, dict]) -> None:
